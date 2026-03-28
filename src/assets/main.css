@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #283618;
+  --color-primary-light: #606C38;
+  --color-secondary: #BC6C25;
+  --color-accent: #DDA15E;
+  --color-background: #FEFAE0;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+}
+
+@layer base {
+  :root {
+    --bs-primary: #283618;
+    --bs-primary-rgb: 40, 54, 24;
+    --bs-link-color: #283618;
+    --bs-link-hover-color: #606C38;
+  }
+  body {
+    @apply text-[#283618] bg-background antialiased scroll-smooth;
+    font-family: var(--font-sans);
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-tr from-primary to-primary-light;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 3s infinite;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+

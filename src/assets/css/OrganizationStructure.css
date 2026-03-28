@@ -1,0 +1,37 @@
+.org-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.org-avatar-box {
+  width: 140px;
+  height: 140px;
+  background-color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.org-avatar-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(59, 71, 33, 0.15) !important;
+}
+
+.org-avatar-box img {
+  transition: transform 0.3s ease;
+}
+
+.org-avatar-box:hover img {
+  transform: scale(1.05);
+}
+
+@media (max-width: 576px) {
+  .org-avatar-box {
+    width: 100px;
+    height: 100px;
+  }
+  .org-zigzag-container h4 {
+    font-size: 1.1rem !important;
+  }
+  .org-zigzag-container p {
+    font-size: 0.9rem !important;
+  }
+}
