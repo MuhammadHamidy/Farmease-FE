@@ -1,116 +1,82 @@
-import { defineComponent, ref } from 'vue'
-import '../assets/css/LoginModal.css'
-import { currentRoute, type RouteType } from '../store/navigation'
-
-// ─────────────────────────────────────────────────────────────
-// TODO: Ganti fungsi ini dengan API call ke backend.
-// Backend akan menerima `code`, memvalidasi, dan mengembalikan
-// { module: 'peternakan' | 'perkebunan' } atau error.
-// ─────────────────────────────────────────────────────────────
-function mockAuth(code: string): Promise<{ module: RouteType }> {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const c = code.trim().toUpperCase()
-      // Kode mock: awalan P → peternakan, awalan K → perkebunan
-      if (c.startsWith('P')) resolve({ module: 'peternakan' })
-      else if (c.startsWith('K')) resolve({ module: 'perkebunan' })
-      else reject(new Error('Kode pengguna tidak ditemukan.'))
-    }, 800)
-  })
-}
+import { defineComponent } from 'vue'
+import { useRouter } from 'vue-router'
+import '../assets/css/components/LoginModal.css'
 
 export default defineComponent({
   name: 'LoginPage',
   setup() {
-    const userCode = ref('')
-    const error = ref('')
-    const loading = ref(false)
+    const router = useRouter()
 
-    const handleSubmit = async () => {
-      if (!userCode.value.trim()) {
-        error.value = 'Mohon masukkan kode pengguna.'
-        return
-      }
-      error.value = ''
-      loading.value = true
-      try {
-        const { module } = await mockAuth(userCode.value)
-        currentRoute.value = module
-      } catch (e: unknown) {
-        error.value = e instanceof Error ? e.message : 'Terjadi kesalahan.'
-      } finally {
-        loading.value = false
-      }
+    const goBack = () => {
+      router.push({ name: 'home' })
+    }
+
+    const goToCageLogin = () => {
+      router.push({ name: 'masuk-kandang' })
+    }
+
+    const goToAdmin = () => {
+      router.push({ name: 'admin-login' })
     }
 
     return () => (
-      <div class="login-page">
-        {/* Back button */}
-        <button class="login-page-back" onClick={() => currentRoute.value = 'home'} id="login-back-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-          Kembali
-        </button>
+      <div class="login-page-centered min-vh-100 w-100 d-flex align-items-center justify-content-center bg-light-cream p-3" style={{
+        background: 'linear-gradient(135deg, var(--color-surface-container-low) 0%, var(--color-surface-container-high) 100%)',
+        fontFamily: 'var(--font-family)'
+      }}>
+        {/* Soft Background Botanical Graphics */}
+        <div class="position-absolute opacity-10" style={{ top: '10%', left: '10%', fontSize: '8rem', pointerEvents: 'none', userSelect: 'none' }}>🌿</div>
+        <div class="position-absolute opacity-10" style={{ bottom: '10%', right: '10%', fontSize: '8rem', pointerEvents: 'none', userSelect: 'none' }}>🐏</div>
 
-        <div class="login-form-wrapper">
-          {/* Header */}
-          <div class="login-form-header">
-            <div class="login-form-logo-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                <path d="M11 7h2v6h-2z" fill="white"/>
-                <path d="M11 15h2v2h-2z" fill="white"/>
-              </svg>
+        {/* Center Card */}
+        <div class="login-centered-card shadow-2xl rounded-5 bg-white border border-outline-variant p-4 p-md-5 position-relative overflow-hidden" style={{
+          maxWidth: '480px',
+          width: '100%',
+          boxShadow: '0 25px 50px -12px rgba(21, 66, 18, 0.08)'
+        }}>
+          {/* Card Accent Top Line */}
+          <div class="position-absolute top-0 start-0 w-100" style={{ height: '6px', backgroundColor: 'var(--color-primary)' }}></div>
+
+          {/* Logo & Platform Name */}
+          <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center mb-3">
+              <img src="/icon/logo_farmease.png" alt="Say Hi Agro Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
             </div>
-            <h2 class="login-form-title">DASHBOARD UTAMA</h2>
-            <p class="login-form-subtitle">Pilih modul untuk melanjutkan operasional</p>
+            <h2 class="fw-extrabold text-on-surface mb-1" style={{ letterSpacing: '-0.02em', fontSize: '1.75rem', fontFamily: 'var(--font-outfit), sans-serif' }}>OvisManage</h2>
+            <p class="text-on-surface-variant small m-0">Sistem Manajemen Peternakan Say Hi Agro Farm</p>
           </div>
 
-          {/* Info/input card */}
-          <div class="login-info-card">
-            <p class="login-info-card-title">Akses Cepat Modul</p>
-            <div class="login-input-row">
-              <input
-                id="login-code-input"
-                class="login-code-input"
-                type="text"
-                placeholder="Masukkan kode (P atau K)..."
-                value={userCode.value}
-                disabled={loading.value}
-                onInput={(e) => {
-                  userCode.value = (e.target as HTMLInputElement).value
-                  error.value = ''
-                }}
-                onKeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') handleSubmit() }}
-              />
-              <button
-                class="login-submit-btn"
-                onClick={handleSubmit}
-                id="login-masuk-btn"
-                disabled={loading.value}
-                style={{ opacity: loading.value ? 0.7 : 1, cursor: loading.value ? 'not-allowed' : 'pointer' }}
-              >
-                {loading.value
-                  ? <span class="login-spinner" />
-                  : 'Masuk'
-                }
-              </button>
-            </div>
-            {error.value && (
-              <p style={{ color: '#FEFAE0', fontSize: '0.78rem', marginTop: '0.5rem', fontFamily: "'Nunito', sans-serif" }}>
-                ⚠ {error.value}
-              </p>
-            )}
+          <hr class="my-4 border-outline-variant" />
+
+          {/* Quick Access */}
+          <div class="d-grid gap-3">
+            <button
+              type="button"
+              class="btn w-100 py-3 rounded-pill fw-bold text-white shadow-sm border-0 d-flex align-items-center justify-content-center gap-2"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+              onClick={goToCageLogin}
+            >
+              <img src="/icon/kandang.png" alt="Masuk Kandang" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+              Masuk Kandang
+            </button>
+
+            <button
+              type="button"
+              class="btn w-100 py-3 rounded-pill fw-bold border d-flex align-items-center justify-content-center gap-2"
+              style={{ backgroundColor: '#F7F3ED', color: 'var(--color-primary)' }}
+              onClick={goToAdmin}
+            >
+              <img src="/icon/admin/grey-20.svg" alt="Admin" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+              Masuk Admin Farm
+            </button>
           </div>
 
-          {/* Hint for dev/demo */}
-          <p class="login-footer-note" style={{ marginTop: '1rem' }}>
-            <strong style={{ color: '#DDA15E' }}>Demo:</strong> kode awalan <strong>P</strong> → Peternakan &nbsp;|&nbsp; awalan <strong>K</strong> → Perkebunan
-          </p>
+          {/* Back Button */}
+          <button type="button" class="btn btn-link w-100 mt-3 text-secondary text-xs text-decoration-none" onClick={goBack}>
+            ← Kembali ke Portal Publik
+          </button>
         </div>
       </div>
     )
   }
 })
-

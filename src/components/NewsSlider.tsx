@@ -1,5 +1,5 @@
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue'
-import '../assets/css/NewsSlider.css'
+import '../assets/css/components/NewsSlider.css'
 
 const newsData = [
   {
@@ -59,7 +59,7 @@ export default defineComponent({
           style={{ transform: `translateX(-${currentIndex.value * 100}%)` }}
         >
           {newsData.map((news) => (
-            <div key={news.id} class="w-100 h-100 flex-shrink-0 position-relative">
+            <div key={news.id} class="w-100 h-100 shrink-0 position-relative">
               <img 
                 src={news.image} 
                 alt={news.title} 
@@ -67,7 +67,7 @@ export default defineComponent({
               />
               {/* Overlay Content */}
               <div class="news-overlay position-absolute bottom-0 start-0 w-100 p-4 p-md-5">
-                <span class="news-tag d-inline-block px-3 py-1 text-white fw-bold text-uppercase mb-3 shadow-sm" style={{ backgroundColor: '#283618' }}>
+                <span class="news-tag d-inline-block px-3 py-1 text-white fw-bold text-uppercase mb-3 shadow-sm" style={{ backgroundColor: 'var(--color-secondary)' }}>
                   {news.tag}
                 </span>
                 <h3 class="news-title text-white fw-bolder mb-2 lh-sm">

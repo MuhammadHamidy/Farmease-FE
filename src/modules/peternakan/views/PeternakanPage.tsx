@@ -1,15 +1,20 @@
 import { defineComponent, ref } from 'vue';
-import '../../../assets/css/PeternakanPage.css';
-import { currentRoute } from '../../../store/navigation';
-import Typography from '../../../components/ui/Typography';
+import { useRouter } from 'vue-router';
+import '../../../assets/css/modules/peternakan/PeternakanPage.css';
+import { userSession, cageSession } from '../../../store/navigation';
+import Typography from '../../../components/ui/peternakan/Typography';
 import DasborView from './DasborView';
 import TernakView from './TernakView';
 import PencatatanView from './PencatatanView';
+import PencatatanDetailView from './PencatatanDetailView';
 import RiwayatView from './RiwayatView';
+import TernakDetailView from './TernakDetailView';
+import PencatatanFormView from './PencatatanFormView';
+import Badge from '../../../components/ui/peternakan/Badge';
+import { selectedTernakId } from '../../../store/navigation';
 
 const tabs = [
-  { id: 'dasbor',      label: 'Dasbor' },
-  { id: 'ternak',      label: 'Ternak' },
+  { id: 'dasbor',      label: 'Dasbor & Ternak' },
   { id: 'pencatatan',  label: 'Pencatatan' },
   { id: 'riwayat',     label: 'Riwayat' },
 ];
@@ -17,61 +22,70 @@ const tabs = [
 export default defineComponent({
   name: 'PeternakanPage',
   setup() {
+    const router = useRouter();
     const activeTab = ref('dasbor');
 
     return () => (
       <div class="peternakan-page">
-
-        {/* ── Green header + tabs ──────────────────── */}
-        <div class="peternakan-header">
-          <div class="peternakan-header-top">
-            <div class="d-flex align-items-center gap-3">
-              <button class="peternakan-back-btn" onClick={() => currentRoute.value = 'home'}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="15 18 9 12 15 6"/>
-                </svg>
-                Beranda
-              </button>
-              <div>
-                <Typography variant="h1" size="text-xl" weight="bold" color="white" className="m-0 lh-1">
-                  Peternakan
-                </Typography>
-                <Typography variant="p" size="text-xs" className="m-0" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                  Sah Hai Agro Farm
-                </Typography>
-              </div>
-            </div>
-            <button
-              class="peternakan-back-btn"
-              onClick={() => currentRoute.value = 'home'}
+        {/* ── Dashboard Header (Clean Version) ────────────────── */}
+        <header class="peternakan-header-v2">
+          <div class="header-left-group">
+            <div 
+              class="peternakan-logo-container" 
+              onClick={() => router.push({ name: 'home' })} 
+              style={{ cursor: 'pointer' }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-              </svg>
-              Keluar
-            </button>
+              <img src="/icon/logo_farmease.png" alt="FARMease" style={{ height: '44px', objectFit: 'contain' }} />
+            </div>
+            <div class="header-divider d-none d-sm-block"></div>
+            <h1 class="peternakan-header-title d-none d-sm-block">Sah Hi Agro Farm</h1>
           </div>
 
-          {/* Tab nav */}
-          <nav class="peternakan-tab-nav">
+          <div class="header-right-group">
+            <button 
+              class="header-logout-btn" 
+              onClick={() => { userSession.value = null; cageSession.value = null; router.push({ name: 'home' }) }}
+              title="Keluar"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        {/* ── Pill Tab Navigation ──────────────────────── */}
+        <nav class="peternakan-nav-container">
+          <div class="peternakan-tab-pills">
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                class={['peternakan-tab-btn', activeTab.value === tab.id ? 'active' : '']}
+                class={['peternakan-tab-pill', activeTab.value === tab.id ? 'active' : '']}
                 onClick={() => activeTab.value = tab.id}
               >
                 {tab.label}
               </button>
             ))}
-          </nav>
-        </div>
+          </div>
+        </nav>
 
-        {/* ── Content ─────────────────────────────── */}
         <div class="peternakan-content">
-          {activeTab.value === 'dasbor'     && <DasborView />}
-          {activeTab.value === 'ternak'     && <TernakView />}
-          {activeTab.value === 'pencatatan' && <PencatatanView />}
-          {activeTab.value === 'riwayat'    && <RiwayatView />}
+          {selectedTernakId.value ? (
+            <TernakDetailView onGoToPencatatan={() => activeTab.value = 'pencatatan'} />
+          ) : (
+            <>
+              {activeTab.value === 'dasbor'     && <DasborView onGoToPencatatan={() => activeTab.value = 'pencatatan'} />}
+              {activeTab.value === 'pencatatan' && <PencatatanView />}
+              {activeTab.value === 'riwayat'    && <RiwayatView />}
+            </>
+          )}
+          {/* Jika ada selected pencatatan payload, tunjukkan halaman detail */}
+          {/** selectedPencatatanPayload rendered at top-level so it overlays tab views when set */}
+          {/** This file intentionally keeps tab flow; PencatatanDetailView reads store directly */}
+          <PencatatanFormView />
+          <PencatatanDetailView />
         </div>
       </div>
     );
